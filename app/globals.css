@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0a0a0a;
+  --foreground: #1a1a1a;
+  --color-white: #ffffff;
+  --color-btn: #2563eb;
+  --color-btn-hover: #1d4ed8;
+  --color-accent: #3b82f6;
+  --color-text: #e5e7eb;
+  --color-text-secondary: #9ca3af;
+  --color-border: #374151;
+  
+  /* Component-specific background colors */
+  --hero-bg: #0f172a;
+  --work-bg: #1e293b;
+  --about-bg: #0f172a;
+  --services-bg: #1e293b;
+  --testimonials-bg: #0f172a;
+  --contact-bg: #1e293b;
+  --footer-bg: #0f172a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-white: var(--color-white);
+  --color-btn: var(--color-btn);
+  --color-accent: var(--color-accent);
+  --color-text: var(--color-text);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-border: var(--color-border);
+  --font-sans: var(--font-helvetica);
+  --font-mono: var(--font-roboto);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #1a1a1a;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--color-text);
+  font-family: var(--font-roboto);
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-helvetica);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-white);
+}
+
+p {
+  font-family: var(--font-roboto);
+  color: var(--color-text-secondary);
+}
+
+.btn-primary {
+  background-color: var(--color-btn);
+  color: var(--color-white);
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-btn-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.section-padding {
+  padding: 6rem 0;
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 0 2rem;
+  }
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent);
+}

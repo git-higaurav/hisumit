@@ -111,10 +111,10 @@ const Footer = () => {
         {/* Copyright Bar */}
         <div className="pt-8 border-t border-gray-800/30 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">
-            &copy; {currentYear} Sumit Walia. All rights reserved.
+            &copy; {currentYear} higaurav.com All rights reserved.
           </p>
           <p className="text-gray-500 text-sm mt-2 md:mt-0">
-            Designed & Developed with <span className="text-blue-400">❤️</span>
+            Designed & Developed by <span className="text-blue-400"><a href="https://www.higaurav.com" target='_blank'>Gaurav Kumar</a></span>
           </p>
         </div>
       </div>

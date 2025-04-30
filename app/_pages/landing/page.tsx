@@ -64,7 +64,7 @@ const LandingPage = () => {
             <div className="absolute bottom-0 w-48 h-48 bg-blue-500/5 blur-3xl rounded-full"></div>
             <div className="relative group">
               <Image
-                src="/images/man.png"
+                src="/images/sumit1.png"
                 alt="Sumit Walia"
                 width={500}
                 height={700}

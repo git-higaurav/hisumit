@@ -1,18 +1,72 @@
 "use client"
 import { useState } from 'react';
+import { contactFormSchema } from '@/lib/validation/form';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
+    name: "",
+    email: "",
+    message: ""
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [status, setStatus] = useState<{
+    type: 'success' | 'error' | null;
+    message: string;
+  }>({ type: null, message: '' });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    console.log('Form submitted:', formData);
+    setIsSubmitting(true);
+    setStatus({ type: null, message: '' });
+
+    try {
+      // Validate the form data using Zod
+      const result = contactFormSchema.safeParse(formData);
+      
+      if (!result.success) {
+        const errorMessage = result.error.errors[0].message;
+        throw new Error(errorMessage);
+      }
+
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send message');
+      }
+
+      setStatus({
+        type: 'success',
+        message: 'Thank you! Your message has been sent successfully.',
+      });
+
+      setTimeout(() => {
+        setStatus({ type: null, message: '' });
+      }, 5000);
+      
+      // Reset form
+      setFormData({
+        name: "",
+        email: "",
+        message: ""
+      });
+    } catch (error) {
+      setStatus({
+        type: 'error',
+        message: error instanceof Error ? error.message : 'An error occurred while sending your message.',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -42,8 +96,8 @@ const Contact = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Contact Info & Map */}
-            <div className="space-y-8">
-              <div className="group relative bg-gray-800/50 backdrop-blur-sm p-8 rounded-xl border border-gray-700/30 hover:border-gray-600/50 transition-all duration-500">
+            <div className="h-full">
+              <div className="group relative bg-gray-800/50 backdrop-blur-sm p-8 rounded-xl border border-gray-700/30 hover:border-gray-600/50 transition-all duration-500 h-full">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 
                 <h3 className="text-2xl font-bold text-white mb-6">Contact Information</h3>
@@ -103,7 +157,7 @@ const Contact = () => {
                 </div>
               </div>
 
-              <div className="h-64 rounded-xl overflow-hidden border border-gray-700/30">
+              {/* <div className="h-64 rounded-xl overflow-hidden border border-gray-700/30">
                 <iframe 
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.0910527575415!2d-122.41941708468204!3d37.78994997975504!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8085809c6c8f4459%3A0xb10ed6d9b5050fa5!2sSan+Francisco%2C+CA!5e0!3m2!1sen!2sus!4v1532723984815"
                   width="100%"
@@ -112,81 +166,91 @@ const Contact = () => {
                   allowFullScreen
                   loading="lazy"
                 ></iframe>
-              </div>
+              </div> */}
             </div>
 
             {/* Contact Form */}
-            <div className="group relative bg-gray-800/50 backdrop-blur-sm p-8 rounded-xl border border-gray-700/30 hover:border-gray-600/50 transition-all duration-500">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              
-              <h3 className="text-2xl font-bold text-white mb-6">Send Message</h3>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-400 mb-2">Name</label>
-                    <input 
-                      type="text" 
-                      id="name" 
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700/30 rounded-lg text-white focus:outline-none focus:border-blue-400 transition-colors"
-                      placeholder="Your name"
-                    />
+            <div className="h-full">
+              <div className="group relative bg-gray-800/50 backdrop-blur-sm p-8 rounded-xl border border-gray-700/30 hover:border-gray-600/50 transition-all duration-500 h-full">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                
+                <h3 className="text-2xl font-bold text-white mb-6">Send Message</h3>
+                
+                {status.type && (
+                  <div className={`mb-6 p-4 rounded-lg ${
+                    status.type === 'success' 
+                      ? 'bg-green-500/10 border border-green-500/20 text-green-400'
+                      : 'bg-red-500/10 border border-red-500/20 text-red-400'
+                  }`}>
+                    {status.message}
                   </div>
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-400 mb-2">Email</label>
-                    <input 
-                      type="email" 
-                      id="email" 
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700/30 rounded-lg text-white focus:outline-none focus:border-blue-400 transition-colors"
-                      placeholder="Your email"
-                    />
+                )}
+
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <label htmlFor="name" className="block text-sm font-medium text-gray-400 mb-2">Name</label>
+                      <input 
+                        type="text" 
+                        id="name" 
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700/30 rounded-lg text-white focus:outline-none focus:border-blue-400 transition-colors"
+                        placeholder="Your name"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="email" className="block text-sm font-medium text-gray-400 mb-2">Email</label>
+                      <input 
+                        type="email" 
+                        id="email" 
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700/30 rounded-lg text-white focus:outline-none focus:border-blue-400 transition-colors"
+                        placeholder="Your email"
+                        required
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <div>
-                  <label htmlFor="subject" className="block text-sm font-medium text-gray-400 mb-2">Subject</label>
-                  <input 
-                    type="text" 
-                    id="subject" 
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700/30 rounded-lg text-white focus:outline-none focus:border-blue-400 transition-colors"
-                    placeholder="What's this about?"
-                  />
-                </div>
+                  <div>
+                    <label htmlFor="message" className="block text-sm font-medium text-gray-400 mb-2">Message</label>
+                    <textarea 
+                      id="message" 
+                      name="message"
+                      value={formData.message}
+                      onChange={handleChange}
+                      rows={6}
+                      className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700/30 rounded-lg text-white focus:outline-none focus:border-blue-400 transition-colors resize-none"
+                      placeholder="Your message..."
+                      required
+                    ></textarea>
+                  </div>
 
-                <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-400 mb-2">Message</label>
-                  <textarea 
-                    id="message" 
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    rows={6}
-                    className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700/30 rounded-lg text-white focus:outline-none focus:border-blue-400 transition-colors resize-none"
-                    placeholder="Your message..."
-                  ></textarea>
-                </div>
-
-                <button 
-                  type="submit"
-                  className="w-full py-4 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium transition-all duration-300 relative group overflow-hidden"
-                >
-                  <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-blue-400/20 to-transparent blur-sm group-hover:animate-pulse"></span>
-                  <span className="relative flex items-center justify-center">
-                    Send Message
-                    <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                  </span>
-                </button>
-              </form>
+                  <button 
+                    type="submit"
+                    disabled={isSubmitting}
+                    className={`w-full py-4 ${
+                      isSubmitting 
+                        ? 'bg-blue-600/50 cursor-not-allowed'
+                        : 'bg-blue-600 hover:bg-blue-700'
+                    } rounded-lg text-white font-medium transition-all duration-300 relative group overflow-hidden`}
+                  >
+                    <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-blue-400/20 to-transparent blur-sm group-hover:animate-pulse"></span>
+                    <span className="relative flex items-center justify-center">
+                      {isSubmitting ? 'Sending...' : 'Send Message'}
+                      {!isSubmitting && (
+                        <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                      )}
+                    </span>
+                  </button>
+                </form>
+              </div>
             </div>
           </div>
         </div>

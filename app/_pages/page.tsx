@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
 const LandingPage = () => {
   return (
@@ -46,30 +47,29 @@ const LandingPage = () => {
             <div className="pt-10 flex flex-col sm:flex-row gap-4 sm:space-x-6">
               <button className="px-6 sm:px-8 py-3 sm:py-4 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium transition-all duration-300 relative group overflow-hidden">
                 <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-blue-400/20 to-transparent blur-sm group-hover:animate-pulse"></span>
-                <span className="relative flex items-center justify-center">
+                <Link href="#work" className="relative flex items-center justify-center">
                   View Portfolio
                   <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   </svg>
-                </span>
+                </Link>
               </button>
-              <button className="px-6 sm:px-8 py-3 sm:py-4 bg-gray-800 hover:bg-gray-700 rounded-lg text-white font-medium transition-all duration-300 border border-gray-700 hover:border-gray-600">
-                Get In Touch
-              </button>
+              <Link href="/login" className="px-6 cursor-pointer sm:px-8 py-3 sm:py-4 bg-gray-800 hover:bg-gray-700 rounded-lg text-white font-medium transition-all duration-300 border border-gray-700 hover:border-gray-600">
+                Login
+              </Link>
             </div>
           </div>
 
           {/* Image Section */}
           <div className="w-full md:w-1/2 mt-12 md:mt-0 flex justify-center relative">
             <div className="absolute bottom-0 w-48 h-48 bg-blue-500/5 blur-3xl rounded-full"></div>
-            <div className="relative group">
+            <div className="relative group h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px] w-full flex items-center justify-center">
               <Image
                 src="/images/sumit1.png"
                 alt="Sumit Walia"
                 width={500}
                 height={700}
-                className="rounded-lg object-cover shadow-lg relative  max-h-[70vh] w-auto"
-                style={{ objectPosition: 'center bottom' }}
+                className="rounded-lg shadow-lg relative h-full w-auto object-contain md:object-cover lg:object-contain"
                 priority
               />
               <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-70"></div>

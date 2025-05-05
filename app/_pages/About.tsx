@@ -1,5 +1,5 @@
 import Image from 'next/image';
-
+import Link from 'next/link';
 const About = () => {
   return (
     <section id="about" className="py-12 sm:py-16 md:py-24 bg-gray-900 relative">
@@ -50,7 +50,7 @@ const About = () => {
 
             <button className="w-full sm:w-auto group relative px-6 sm:px-8 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium transition-all duration-300 overflow-hidden">
               <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-blue-400/20 to-purple-500/20 blur group-hover:animate-pulse"></span>
-              <span className="relative">View Portfolio</span>
+              <Link href="#contact" className="relative">Connect with me  </Link>
             </button>
           </div>
         </div>

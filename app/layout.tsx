@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
+import { Toaster } from "react-hot-toast";
 import localFont from "next/font/local";
 
 const helvetica = localFont({
@@ -39,6 +39,26 @@ export default function RootLayout({
       <body
         className={`${helvetica.variable} ${roboto.variable} antialiased`}
       >
+        <Toaster 
+          position="top-center"
+          toastOptions={{
+            duration: 3000,
+            style: {
+              background: '#333',
+              color: '#fff',
+            },
+            success: {
+              style: {
+                background: '#065f46',
+              },
+            },
+            error: {
+              style: {
+                background: '#991b1b',
+              },
+            },
+          }}
+        />
         {children}
       </body>
     </html>

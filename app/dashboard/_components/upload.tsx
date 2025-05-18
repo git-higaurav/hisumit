@@ -86,9 +86,7 @@ const UploadWidget = ({ onUploadSuccess, onUploadError, resourceType = 'image' }
                 setUploadProgress(result.info.progress || 0);
                 break;
               case "success":
-                console.log("Upload successful. Full result:", result);
-                console.log("Upload successful. File info:", result.info);
-                if (!result.info.secure_url || !result.info.public_id) {
+                                                if (!result.info.secure_url || !result.info.public_id) {
                   console.error("Missing required fields in upload response:", result.info);
                   onUploadError?.("Upload response missing required fields");
                   return;

@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     }
 
     const { title, videoUrl, public_id } = result.data;
-    console.log('Validated data:', { title, videoUrl, public_id });
+    
 
     // Connect to database
     await connectDB();

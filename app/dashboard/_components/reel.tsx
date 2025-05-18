@@ -185,9 +185,7 @@ export default function Reel() {
         return;
       }
 
-      console.log('Submitting reel data:', result.data);
-
-      const response = await fetch('/api/reel', {
+            const response = await fetch('/api/reel', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -213,9 +211,7 @@ export default function Reel() {
   };
 
   const handleUploadSuccess = (result: any) => {
-    console.log('Upload result:', result);
-    
-    // Validate required fields
+        // Validate required fields
     if (!result.secure_url || !result.public_id) {
       const errorMessage = 'Upload response missing required fields';
       console.error(errorMessage, result);
@@ -234,8 +230,7 @@ export default function Reel() {
         videoUrl: result.secure_url,
         public_id: result.public_id
       };
-      console.log('Setting new form data:', newFormData);
-      return newFormData;
+            return newFormData;
     });
 
     if (errors.videoUrl) {

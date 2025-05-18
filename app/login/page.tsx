@@ -1,15 +1,36 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { account } from '@/lib/appwrite';
 
 export default function Login() {
+ 
   const router = useRouter();
+  const [user, setUser]=useState<Object | null>(null)
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  
+
+  useEffect(()=>{
+    const getAuth = async()=>{
+      try { 
+      setLoading(true)
+      const user = await account.get();
+      if(user){
+          router.push("/dashboard")
+      }
+      } catch (error) {
+        setLoading(false)
+        console.log(error)
+      }
+    }
+    getAuth();
+  },[])
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,6 +46,8 @@ export default function Login() {
       setLoading(false);
     }
   };
+
+
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#0A0A0A]">

@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     }
 
     const { title, videoUrl, public_id } = result.data;
-    console.log('Validated data:', { title, videoUrl, public_id });
+   
 
     // Connect to database
     await connectDB();
@@ -119,9 +119,7 @@ export async function DELETE(request: Request) {
         { status: 404 }
       );
     }
-    console.log('Video found:', video);
-    console.log('Public ID:', video.public_id);
-    // Delete the video from Cloudinary
+            // Delete the video from Cloudinary
     try {
         await cloudinary.uploader.destroy(video.public_id, {
             resource_type: 'video'
@@ -136,8 +134,7 @@ export async function DELETE(request: Request) {
     }
 
     // Delete from database
-    console.log('Deleting video from database:', id);
-    const deletedVideo = await Video.findByIdAndDelete(id);
+        const deletedVideo = await Video.findByIdAndDelete(id);
 
     if (!deletedVideo) {
       console.error('Video not found in database after Cloudinary deletion');

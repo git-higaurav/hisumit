@@ -18,7 +18,7 @@ export async function POST(request: Request) {
         }
 
         const { title, description, imageUrl , public_id} = validationResult.data;
-        console.log(title, description, imageUrl , public_id)
+        
 
         // Connect to database
         await connectDB();

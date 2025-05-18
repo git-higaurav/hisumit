@@ -296,7 +296,7 @@ export default function Graphic() {
             const result = imageFormSchema.safeParse(formData);
             
             if (!result.success) {
-                console.log('Validation errors:', result.error.errors);
+               
                 const formattedErrors: Partial<Record<keyof ImageFormData, string>> = {};
                 result.error.errors.forEach((error) => {
                     const path = error.path[0] as keyof ImageFormData;
@@ -341,8 +341,7 @@ export default function Graphic() {
                 imageUrl: result.secure_url,
                 public_id: result.public_id
             };
-            console.log('Setting new form data:', newFormData);
-            return newFormData;
+                        return newFormData;
         });
         setImagePreview(result.secure_url);
         if (errors.imageUrl) {
@@ -352,8 +351,7 @@ export default function Graphic() {
 
     const handleUploadError = (error: any) => {
         const errorMessage = error?.message || error?.error?.message || 'An unexpected upload error occurred';
-        console.log(error?.message + "this is error happened");
-        toast.error(errorMessage);
+                toast.error(errorMessage);
         setErrors(prev => ({
             ...prev,
             imageUrl: errorMessage

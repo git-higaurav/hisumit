@@ -46,8 +46,7 @@ export async function POST(request: Request) {
         body: cloudinaryFormData,
       }
     );
-    console.log(uploadResponse);
-    if (!uploadResponse.ok) {
+        if (!uploadResponse.ok) {
       const errorData = await uploadResponse.text();
       console.error('Cloudinary upload failed:', errorData);
       throw new Error('Failed to upload image to Cloudinary');

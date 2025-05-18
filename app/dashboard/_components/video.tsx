@@ -41,9 +41,7 @@ function VideoList() {
         const toastId = toast.loading('Deleting video...');
 
         try {
-            console.log('Deleting video with ID:', id, 'and public_id:', public_id);
-            
-            const response = await fetch(`/api/video?id=${id}&public_id=${public_id}`, {
+                        const response = await fetch(`/api/video?id=${id}&public_id=${public_id}`, {
                 method: 'DELETE',
             });
 
@@ -192,9 +190,7 @@ export default function Video() {
     };
 
     const handleUploadSuccess = (result: any) => {
-        console.log('Upload result:', result);
-        
-        // Validate required fields
+                // Validate required fields
         if (!result.secure_url || !result.public_id) {
             const errorMessage = 'Upload response missing required fields';
             console.error(errorMessage, result);
@@ -209,8 +205,7 @@ export default function Video() {
                 videoUrl: result.secure_url,
                 public_id: result.public_id
             };
-            console.log('Setting new form data:', newFormData);
-            return newFormData;
+                        return newFormData;
         });
     };
 

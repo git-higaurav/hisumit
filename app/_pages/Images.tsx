@@ -63,36 +63,6 @@ const ImageModal = ({ isOpen, onClose, project, projects, onNavigate, static: is
                     </svg>
                 </button>
 
-                {/* Navigation Arrows */}
-                {hasPrev && (
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation()
-                            onNavigate('prev')
-                        }}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white/80 hover:text-white p-3 rounded-full transition-all duration-300 ease-in-out transform hover:scale-110 z-10 backdrop-blur-sm"
-                        aria-label="Previous image"
-                    >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                        </svg>
-                    </button>
-                )}
-                {hasNext && (
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation()
-                            onNavigate('next')
-                        }}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white/80 hover:text-white p-3 rounded-full transition-all duration-300 ease-in-out transform hover:scale-110 z-10 backdrop-blur-sm"
-                        aria-label="Next image"
-                    >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                    </button>
-                )}
-
                 <div className="relative w-full h-full">
                     <Image
                         src={project.imageUrl}
@@ -103,6 +73,70 @@ const ImageModal = ({ isOpen, onClose, project, projects, onNavigate, static: is
                         priority
                         quality={100}
                     />
+                </div>
+
+                {/* Navigation Arrows - Moved below the image */}
+                <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-4 md:hidden">
+                    {hasPrev && (
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                onNavigate('prev')
+                            }}
+                            className="bg-black/50 hover:bg-black/70 text-white/80 hover:text-white p-3 rounded-full transition-all duration-300 ease-in-out transform hover:scale-110 z-10 backdrop-blur-sm"
+                            aria-label="Previous image"
+                        >
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+                    )}
+                    {hasNext && (
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                onNavigate('next')
+                            }}
+                            className="bg-black/50 hover:bg-black/70 text-white/80 hover:text-white p-3 rounded-full transition-all duration-300 ease-in-out transform hover:scale-110 z-10 backdrop-blur-sm"
+                            aria-label="Next image"
+                        >
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                    )}
+                </div>
+
+                {/* Desktop Navigation Arrows */}
+                <div className="hidden md:block">
+                    {hasPrev && (
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                onNavigate('prev')
+                            }}
+                            className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white/80 hover:text-white p-3 rounded-full transition-all duration-300 ease-in-out transform hover:scale-110 z-10 backdrop-blur-sm"
+                            aria-label="Previous image"
+                        >
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+                    )}
+                    {hasNext && (
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                onNavigate('next')
+                            }}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white/80 hover:text-white p-3 rounded-full transition-all duration-300 ease-in-out transform hover:scale-110 z-10 backdrop-blur-sm"
+                            aria-label="Next image"
+                        >
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                    )}
                 </div>
             </div>
         </div>
@@ -172,7 +206,7 @@ export default function Images() {
     }
 
     return (
-        <section className="py-16 bg-gradient-to-b from-gray-900 to-dark-darker min-h-screen">
+        <section className="py-16 bg-gradient-to-b from-gray-900 to-dark-darker min-h-screen border-y-1">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="text-center mb-12">
                     <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">

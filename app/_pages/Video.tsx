@@ -1,45 +1,38 @@
 "use client"
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import axiosInstance from '@/lib/axios';
 
 interface VideoItem {
     _id: string;
     title: string;
     videoUrl: string;
+    createdAt: string;
+}
+
+const getData = async (): Promise<VideoItem[]> => {
+    const res = await axiosInstance.get("/video")
+    return res.data
 }
 
 export default function Video() {
     const [selectedVideo, setSelectedVideo] = useState<VideoItem | null>(null);
     const [visibleVideos, setVisibleVideos] = useState(3);
-    const [videos, setVideos] = useState<VideoItem[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        const fetchVideos = async () => {
-            try {
-                setIsLoading(true);
-                setError(null);
-                const response = await fetch('/api/video');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch videos');
-                }
-                const data = await response.json();
-                setVideos(data);
-            } catch (err) {
-                setError(err instanceof Error ? err.message : 'An error occurred while fetching videos');
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchVideos();
-    }, []);
+    const { isPending, isError, data: videos } = useQuery<VideoItem[]>({
+        queryKey: ['videos'],
+        queryFn: getData,
+        staleTime: Infinity,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+        refetchInterval: false
+    });
 
     const loadMore = () => {
         setVisibleVideos(prev => prev + 3);
     };
 
-    if (isLoading) {
+    if (isPending) {
         return (
             <div className="min-h-screen py-6 bg-gray-900 flex items-center justify-center">
                 <div className="text-gray-100 text-xl">Loading videos...</div>
@@ -47,10 +40,10 @@ export default function Video() {
         );
     }
 
-    if (error) {
+    if (isError) {
         return (
             <div className="min-h-screen py-6 bg-gray-900 flex items-center justify-center">
-                <div className="text-red-500 text-xl">{error}</div>
+                <div className="text-red-500 text-xl">An error occurred while fetching videos</div>
             </div>
         );
     }
@@ -103,7 +96,7 @@ export default function Video() {
                     </div>
                 )}
 
-                {videos.length === 0 ? (
+                {!videos || videos.length === 0 ? (
                     <div className="text-center text-gray-100 py-12">
                         No videos available
                     </div>

@@ -6,9 +6,13 @@ import Testimonials from "./_pages/Testimonials";
 import Footer from "./_pages/Footer";
 import Contact from "./_pages/Contact";
 import Works from "./_pages/Works";
+
+
 export default function Home() {
+
   return (
     <>
+
       <Landing />
       <Works />
       {/* <Work /> */}
@@ -17,6 +21,7 @@ export default function Home() {
       <Testimonials />
       <Contact />
       <Footer />
+
     </>
   )
 }

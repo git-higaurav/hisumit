@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import localFont from "next/font/local";
+import Providers from "./Providers";
 
 const helvetica = localFont({
   src: "../public/font/Helvetica.otf",
@@ -14,26 +14,14 @@ const roboto = localFont({
   variable: "--font-roboto",
 });
 
-// const geistSans = Geist({
-//   variable: "--font-geist-sans",
-//   subsets: ["latin"],
-// });
-
-// const geistMono = Geist_Mono({
-//   variable: "--font-geist-mono",
-//   subsets: ["latin"],
-// });
-
 export const metadata: Metadata = {
   title: "Sumit Walia",
   description: "Created by higaurav.com",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout(
+  { children }: Readonly<{children: React.ReactNode;}>
+) {
   return (
     <html lang="en">
       <body
@@ -59,7 +47,9 @@ export default function RootLayout({
             },
           }}
         />
-        {children}
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );

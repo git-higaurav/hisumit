@@ -48,6 +48,10 @@ const Service = () => {
     }
   ];
 
+  const handleWhatsAppRedirect = () => {
+    window.open(`https://wa.me/919536280050`, '_blank');
+  };
+
   return (
     <section id="services" className="py-24 bg-[var(--services-bg)] relative overflow-hidden">
       {/* Background effects */}
@@ -106,8 +110,11 @@ const Service = () => {
                   ))}
                 </ul>
 
-                <button className="w-full py-3 px-4 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition-all duration-300 flex items-center justify-center group">
-                  <span className="relative flex items-center">
+                <button 
+                  onClick={handleWhatsAppRedirect}
+                  className="cursor-pointer w-full py-3 px-4 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition-all duration-300 flex items-center justify-center group"
+                >
+                  <span className="relative flex items-center cursor-pointer">
                     Get Started
                     <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />

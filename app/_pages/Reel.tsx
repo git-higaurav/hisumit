@@ -1,5 +1,7 @@
 "use client"
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import axiosInstance from '@/lib/axios';
 
 interface Reel {
     _id: string;
@@ -8,34 +10,24 @@ interface Reel {
     createdAt: string;
 }
 
+const getData = async (): Promise<Reel[]> => {
+    const res = await axiosInstance.get("/reel")
+    return res.data
+}
+
 export default function Reel() {
     const [activeVideo, setActiveVideo] = useState<string | null>(null);
     const [visibleReels, setVisibleReels] = useState(4);
-    const [reels, setReels] = useState<Reel[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
 
-    useEffect(() => {
-        fetchReels();
-    }, []);
-
-    const fetchReels = async () => {
-        try {
-            setIsLoading(true);
-            setError(null);
-            const response = await fetch('/api/reel');
-            if (!response.ok) {
-                throw new Error('Failed to fetch reels');
-            }
-            const data = await response.json();
-            setReels(data);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'An error occurred while fetching reels');
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    const { isPending, isError, data: reels } = useQuery<Reel[]>({
+        queryKey: ['reels'],
+        queryFn: getData,
+        staleTime: Infinity,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+        refetchInterval: false
+    });
 
     const handleLoadMore = () => {
         setVisibleReels(prev => prev + 4);
@@ -44,7 +36,7 @@ export default function Reel() {
     const handlePlay = async (id: string) => {
         try {
             // Stop all other videos
-            reels.forEach((reel) => {
+            reels?.forEach((reel) => {
                 if (reel._id !== id && videoRefs.current[reel._id]) {
                     videoRefs.current[reel._id]?.pause();
                 }
@@ -79,19 +71,13 @@ export default function Reel() {
         }
     };
 
-    if (error) {
+    if (isError) {
         return (
             <div className="min-h-screen bg-[var(--services-bg)] py-6">
                 <div className="max-w-7xl mx-auto px-6 sm:px-6 lg:px-8">
                     <div className="text-center py-8">
                         <h1 className="text-3xl font-bold text-gray-900 mb-4">Error Loading Reels</h1>
-                        <p className="text-red-600 mb-4">{error}</p>
-                        <button
-                            onClick={fetchReels}
-                            className="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors duration-300 font-medium"
-                        >
-                            Try Again
-                        </button>
+                        <p className="text-red-600 mb-4">An error occurred while fetching reels</p>
                     </div>
                 </div>
             </div>
@@ -111,7 +97,7 @@ export default function Reel() {
 
             {/* Video Grid Section */}
             <div className="max-w-7xl mx-auto px-6 sm:px-6 lg:px-8 pb-12">
-                {isLoading ? (
+                {isPending ? (
                     <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 place-items-center'>
                         {[...Array(4)].map((_, index) => (
                             <div key={index} className="w-full max-w-[300px] aspect-[9/16] bg-gray-200 rounded-xl animate-pulse" />
@@ -120,7 +106,7 @@ export default function Reel() {
                 ) : (
                     <>
                         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 place-items-center'>
-                            {reels.slice(0, visibleReels).map((data) => {
+                            {reels?.slice(0, visibleReels).map((data) => {
                                 const isPlaying = activeVideo === data._id;
                                 return (
                                     <div 
@@ -178,11 +164,11 @@ export default function Reel() {
                         </div>
 
                         {/* Load More Button */}
-                        {visibleReels < reels.length && (
-                            <div className="flex justify-center mt-8">
+                        {reels && visibleReels < reels.length && (
+                            <div className="flex justify-center mt-8 ">
                                 <button
                                     onClick={handleLoadMore}
-                                    className="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors duration-300 font-medium"
+                                    className="bg-blue-600 px-6 py-3 text-white rounded-lg hover:bg-gray-800 transition-colors duration-300 font-medium"
                                 >
                                     Load More
                                 </button>

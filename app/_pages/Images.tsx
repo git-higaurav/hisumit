@@ -1,10 +1,13 @@
 "use client"
 
+import axiosInstance from '@/lib/axios'
+import { useQuery } from '@tanstack/react-query'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
 
 interface Project {
-    id: number
+    _id: number
+    id?: number // Added to match data structure
     title: string
     description: string
     imageUrl: string
@@ -16,12 +19,13 @@ interface ModalProps {
     project: Project | null
     projects: Project[]
     onNavigate: (direction: 'prev' | 'next') => void
+    static?: boolean // Added static prop definition
 }
 
-const ImageModal = ({ isOpen, onClose, project, projects, onNavigate }: ModalProps) => {
+const ImageModal = ({ isOpen, onClose, project, projects, onNavigate, static: isStatic }: ModalProps) => {
     if (!isOpen || !project) return null
 
-    const currentIndex = projects.findIndex(p => p.id === project.id)
+    const currentIndex = projects.findIndex(p => p._id === project._id)
     const hasPrev = currentIndex > 0
     const hasNext = currentIndex < projects.length - 1
 
@@ -42,18 +46,19 @@ const ImageModal = ({ isOpen, onClose, project, projects, onNavigate }: ModalPro
 
     return (
         <div 
-            className="fixed inset-0 z-50 flex items-center justify-center bg-dark-darker/95 backdrop-blur-sm animate-fadeIn"
+            className={`fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md ${isStatic ? '' : 'animate-fadeIn'}`}
             onClick={onClose}
         >
             <div 
-                className="relative w-[90vw] h-[90vh] max-w-7xl animate-scaleIn"
+                className={`relative w-[95vw] h-[95vh] max-w-8xl ${isStatic ? '' : 'animate-scaleIn'}`}
                 onClick={(e) => e.stopPropagation()}
             >
                 <button
                     onClick={onClose}
-                    className="absolute -top-12 right-0 text-white hover:text-accent-light transition-all duration-300 ease-in-out transform hover:scale-110 z-10"
+                    className="absolute -top-4 right-0 text-white/80 hover:text-white transition-all duration-300 ease-in-out transform hover:scale-110 z-10 bg-black/50 rounded-full p-2"
+                    aria-label="Close modal"
                 >
-                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
@@ -65,9 +70,10 @@ const ImageModal = ({ isOpen, onClose, project, projects, onNavigate }: ModalPro
                             e.stopPropagation()
                             onNavigate('prev')
                         }}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-dark-lighter/80 hover:bg-accent text-white p-2 rounded-full transition-all duration-300 ease-in-out transform hover:scale-110 z-10 animate-fadeIn"
+                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white/80 hover:text-white p-3 rounded-full transition-all duration-300 ease-in-out transform hover:scale-110 z-10 backdrop-blur-sm"
+                        aria-label="Previous image"
                     >
-                        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                         </svg>
                     </button>
@@ -78,9 +84,10 @@ const ImageModal = ({ isOpen, onClose, project, projects, onNavigate }: ModalPro
                             e.stopPropagation()
                             onNavigate('next')
                         }}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-dark-lighter/80 hover:bg-accent text-white p-2 rounded-full transition-all duration-300 ease-in-out transform hover:scale-110 z-10 animate-fadeIn"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white/80 hover:text-white p-3 rounded-full transition-all duration-300 ease-in-out transform hover:scale-110 z-10 backdrop-blur-sm"
+                        aria-label="Next image"
                     >
-                        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
                     </button>
@@ -91,63 +98,56 @@ const ImageModal = ({ isOpen, onClose, project, projects, onNavigate }: ModalPro
                         src={project.imageUrl}
                         alt={project.title}
                         fill
-                        sizes="90vw"
-                        className="object-contain transition-all duration-500 ease-in-out animate-fadeIn"
+                        sizes="95vw"
+                        className="object-contain transition-opacity duration-500 ease-in-out animate-fadeIn"
                         priority
                         quality={100}
                     />
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-dark-darker via-dark-lighter/50 to-transparent p-6 animate-slideUp">
-                    <h3 className="text-2xl font-semibold text-white mb-2">{project.title}</h3>
-                    <p className="text-base text-gray-200">{project.description}</p>
                 </div>
             </div>
         </div>
     )
 }
 
+const getData = async (): Promise<Project[]> => {
+    const res = await axiosInstance.get("/graphic")
+    return res.data
+}
+
 export default function Images() {
+    const { isPending, isError, data } = useQuery<Project[]>({
+        queryKey: ['images'],
+        queryFn: getData,
+        staleTime: Infinity,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+        refetchInterval: false
+    })
+
     const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set())
     const [selectedProject, setSelectedProject] = useState<Project | null>(null)
-    const [projects, setProjects] = useState<Project[]>([])
-    const [isLoading, setIsLoading] = useState(true)
-    const [error, setError] = useState<string | null>(null)
-
-    useEffect(() => {
-        const fetchProjects = async () => {
-            try {
-                const response = await fetch('/api/graphic')
-                if (!response.ok) {
-                    throw new Error('Failed to fetch projects')
-                }
-                const data = await response.json()
-                setProjects(data)
-            } catch (err) {
-                setError(err instanceof Error ? err.message : 'An error occurred')
-            } finally {
-                setIsLoading(false)
-            }
-        }
-
-        fetchProjects()
-    }, [])
+    const [visibleCount, setVisibleCount] = useState(6) // Number of initially visible images
 
     const handleImageLoad = (id: number) => {
         setLoadedImages(prev => new Set(prev).add(id))
     }
 
-    const handleNavigate = (direction: 'prev' | 'next') => {
-        if (!selectedProject) return
+    const handleLoadMore = () => {
+        setVisibleCount(prev => prev + 6) // Load 6 more images when clicked
+    }
 
-        const currentIndex = projects.findIndex(p => p.id === selectedProject.id)
+    const handleNavigate = (direction: 'prev' | 'next') => {
+        if (!selectedProject || !data) return
+
+        const currentIndex = data.findIndex(p => p._id === selectedProject._id)
         if (direction === 'prev' && currentIndex > 0) {
-            setSelectedProject(projects[currentIndex - 1])
-        } else if (direction === 'next' && currentIndex < projects.length - 1) {
-            setSelectedProject(projects[currentIndex + 1])
+            setSelectedProject(data[currentIndex - 1])
+        } else if (direction === 'next' && currentIndex < data.length - 1) {
+            setSelectedProject(data[currentIndex + 1])
         }
     }
 
-    if (isLoading) {
+    if (isPending) {
         return (
             <section className="py-12 bg-gray-900 border-t-1 border-gray-700 border-b-0 border-l-0 border-r-0 min-h-screen">
                 <div className="container mx-auto px-6">
@@ -159,12 +159,12 @@ export default function Images() {
         )
     }
 
-    if (error) {
+    if (isError) {
         return (
             <section className="py-12 bg-gray-900 border-t-1 border-gray-700 border-b-0 border-l-0 border-r-0 min-h-screen">
                 <div className="container mx-auto px-6">
                     <div className="text-red-500 text-center">
-                        Error: {error}
+                        An error occurred while fetching the data
                     </div>
                 </div>
             </section>
@@ -172,49 +172,72 @@ export default function Images() {
     }
 
     return (
-        <section className="py-12 bg-gray-900 border-t-1 border-gray-700 border-b-0 border-l-0 border-r-0 min-h-screen">
-            <div className="container mx-auto px-6">
-                <h2 className="text-3xl font-bold mb-8 text-white">Graphic Collection</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {projects.map((project , index) => (
+        <section className="py-16 bg-gradient-to-b from-gray-900 to-dark-darker min-h-screen">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="text-center mb-12">
+                    <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+                        Graphic Collection
+                    </h1>
+                    <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                        Explore our curated collection of stunning visuals and creative designs
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {data?.slice(0, visibleCount).map((project: Project) => (
                         <div 
-                            key={index} 
-                            className="group relative bg-dark-lighter rounded-xl shadow-lg overflow-hidden transition-all duration-300 ease-in-out hover:shadow-xl cursor-pointer transform hover:-translate-y-1 hover:shadow-accent/20"
+                            key={project._id} 
+                            className="group bg-dark-lighter rounded-2xl shadow-xl overflow-hidden transition-all duration-500 ease-out hover:shadow-2xl hover:shadow-accent/20 border-2 border-dark-darker hover:border-accent/30 cursor-pointer"
                             onClick={() => setSelectedProject(project)}
                         >
-                            <div className="relative aspect-[4/3] w-full">
-                                <div className={`absolute inset-0 bg-dark animate-pulse ${loadedImages.has(project.id) ? 'hidden' : 'block'}`} />
+                            {/* Image Container */}
+                            <div 
+                                className="relative aspect-[4/3] w-full overflow-hidden"
+                            >
+                                <div className={`absolute inset-0 bg-gradient-to-br from-dark to-dark-lighter animate-pulse ${
+                                    loadedImages.has(project._id) ? 'hidden' : 'block'
+                                }`} />
                                 <Image
                                     src={project.imageUrl}
                                     alt={project.title}
                                     fill
                                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                    className={`object-cover transition-all duration-500 ease-in-out group-hover:scale-105 ${
-                                        loadedImages.has(project.id) ? 'opacity-100' : 'opacity-0'
+                                    className={`object-cover transition-transform duration-700 ease-out group-hover:scale-105 ${
+                                        loadedImages.has(project._id) ? 'opacity-100' : 'opacity-0'
                                     }`}
-                                    onLoad={() => handleImageLoad(project.id)}
-                                    priority={project.id <= 3}
+                                    onLoad={() => handleImageLoad(project._id)}
+                                    priority={project._id <= 3}
                                 />
                             </div>
-                            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-in-out">
-                                <div className="absolute bottom-0 left-0 right-0 p-4 text-white transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 ease-in-out">
-                                    <div className="absolute inset-0 bg-black/50 rounded-b-xl"></div>
-                                    <div className="relative">
-                                        <h3 className="text-lg font-semibold mb-1">{project.title}</h3>
-                                        <p className="text-xs text-gray-200">{project.description}</p>
-                                    </div>
-                                </div>
+                            
+                            {/* Text Container */}
+                            <div className="p-6 border-t border-dark-darker">
+                                <h3 className="text-xl font-bold text-white mb-3">{project.title}</h3>
+                                <p className="text-gray-300 text-sm line-clamp-2">{project.description}</p>
                             </div>
                         </div>
                     ))}
                 </div>
+                
+                {data && visibleCount < data.length && (
+                    <div className="flex justify-center mt-12">
+                        <button
+                            onClick={handleLoadMore}
+                            className="px-8 py-4 bg-accent hover:bg-accent-light text-white rounded-xl transition-all duration-300 ease-out transform hover:-translate-y-1 hover:shadow-lg hover:shadow-accent/20 font-semibold"
+                        >
+                            Load More Projects
+                        </button>
+                    </div>
+                )}
             </div>
+
             <ImageModal 
                 isOpen={!!selectedProject} 
                 onClose={() => setSelectedProject(null)} 
                 project={selectedProject}
-                projects={projects}
+                projects={data || []}
                 onNavigate={handleNavigate}
+                static
             />
         </section>
     )
